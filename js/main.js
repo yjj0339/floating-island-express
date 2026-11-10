@@ -302,7 +302,7 @@ function deliver() {
     state.phase = 'finishing';
   } else {
     setTimeout(() => {
-      if (state.phase === 'playing') activateOrder(state.orderIdx + 1);
+      if (state.phase === 'playing' || state.phase === 'paused') activateOrder(state.orderIdx + 1);
     }, 420);
   }
 }
