@@ -27,7 +27,18 @@ npx serve .
 | `空格` | 加速冲刺（消耗冲刺能量） |
 | `Esc` | 暂停 / 继续 |
 
-移动端：左下虚拟摇杆控制方向与升降，右下圆形按钮冲刺（圆环显示剩余能量）。
+移动端（横屏）：左下虚拟摇杆控制方向与升降（方向键位会随输入高亮），右下圆形按钮冲刺，外圈光环就是剩余能量；左上角速度/冲刺仪表，右上角分数与暂停键。
+
+## iPhone / iPad 横屏游玩（推荐）
+
+1. Safari 打开 <https://yjj0339.github.io/floating-island-express/>
+2. 点底部「分享」→「添加到主屏幕」
+3. 从桌面图标启动（独立全屏，无地址栏），把手机横过来即可开飞
+
+- `manifest.json` 声明 `display: standalone` + `orientation: landscape`，并带 180/192/512 与 maskable 图标。
+- 竖屏时会显示「请把手机横过来」提示页，转到横屏自动继续（对局中会先自动暂停，转回横屏自动恢复）。
+- 所有 HUD 与按键都按 `env(safe-area-inset-*)` 让开刘海与小黑条，横屏下摇杆/加速键加大点击区域。
+- 已设置 `navigator.audioSession = 'playback'`，iOS 静音键打开时游戏音效依然可听；切到后台会自动暂停。
 
 ## 三种模式
 
@@ -60,10 +71,13 @@ npx serve .
 │   ├── plane.js             # GLB 加载、飞行物理、冲刺尾迹
 │   ├── audio.js             # WebAudio 程序化音效
 │   └── i18n.js              # 中英文案
+├── manifest.json            # PWA 清单（横屏 / 独立窗口 / 图标）
+├── icons/                   # 180·192·512 与 maskable 图标
 ├── assets/models/plane.glb  # 随源码附带的飞机模型
 ├── vendor/                  # 本地 Three.js r158 + GLTFLoader
 └── tools/
     ├── make_plane.py        # 飞机 GLB 生成脚本（无第三方依赖）
+    ├── make_icons.py        # 主屏幕图标生成脚本（Pillow）
     └── model-check.html     # 模型预览小工具
 ```
 

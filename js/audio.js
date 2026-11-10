@@ -14,6 +14,10 @@ export class GameAudio {
       if (this.ctx.state === 'suspended') this.ctx.resume();
       return;
     }
+    // iOS: keep game audio audible even with the hardware mute switch on
+    try {
+      if (navigator.audioSession) navigator.audioSession.type = 'playback';
+    } catch (e) { /* not supported */ }
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
     this.ctx = new AC();

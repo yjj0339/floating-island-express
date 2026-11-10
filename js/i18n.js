@@ -56,6 +56,12 @@ const DICT = {
     hitIsland: '小心浮岛！',
     pkg: '快递',
     langLabel: 'EN',
+    restart: '重新开始',
+    soundOn: '音效开',
+    soundOff: '音效关',
+    rotateTitle: '请把手机横过来',
+    rotateSub: '横屏视野更宽，摇杆与冲刺键也更顺手',
+    installHint: '分享 → 添加到主屏幕',
   },
   en: {
     brandName: 'Sky Post · Floating Branch',
@@ -114,6 +120,12 @@ const DICT = {
     hitIsland: 'Watch the islands!',
     pkg: 'PACKAGE',
     langLabel: '中',
+    restart: 'Restart',
+    soundOn: 'Sound on',
+    soundOff: 'Sound off',
+    rotateTitle: 'Rotate your phone',
+    rotateSub: 'Landscape gives you a wider view and comfier thumb controls',
+    installHint: 'Share → Add to Home Screen',
   },
 };
 

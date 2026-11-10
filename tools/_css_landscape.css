@@ -1,0 +1,105 @@
+
+/* ---------------------------------------------------------- phone landscape */
+@media (orientation: landscape) and (max-height: 580px) {
+  #startScreen {
+    align-items: center;
+    justify-content: flex-start;
+    padding: 12px;
+    padding-left: calc(14px + env(safe-area-inset-left));
+    padding-right: calc(14px + env(safe-area-inset-right));
+  }
+  .start-wrap {
+    width: min(430px, 56vw);
+    max-height: calc(100% - 8px);
+    padding: 14px 16px 12px;
+    border-radius: 22px;
+  }
+  .brand-row { margin-bottom: 8px; gap: 9px; }
+  .brand-badge { width: 32px; height: 32px; border-radius: 10px; }
+  .brand-badge svg { width: 17px; height: 17px; }
+  .brand-kicker { font-size: 9.5px; letter-spacing: 0.18em; }
+  .brand-name { font-size: 11px; }
+  h1.title { font-size: 29px; margin-bottom: 3px; }
+  .subtitle { display: none; }
+  .tagline { display: none; }
+  .sec-label { margin-bottom: 5px; font-size: 9.5px; }
+  .modes { margin-bottom: 10px; gap: 5px; }
+  .mode { padding: 6px 10px; grid-template-columns: 28px 1fr auto; gap: 9px; border-radius: 13px; }
+  .mode-ico { width: 28px; height: 28px; border-radius: 8px; }
+  .mode-ico svg { width: 15px; height: 15px; }
+  .mode-name { font-size: 12.5px; }
+  .mode-desc { display: none; }
+  .ctrls, .sec-label.ctrl-label { display: none; }
+  .start-actions { margin-bottom: 7px; gap: 7px; }
+  .btn-primary { height: 44px; font-size: 14px; }
+  .btn-icon { width: 44px; height: 44px; }
+  .btn-primary svg { width: 14px; height: 14px; }
+  .start-foot { font-size: 10px; gap: 9px; }
+  .start-foot b { font-size: 11.5px; }
+
+  /* HUD */
+  .hud-tl { top: calc(8px + env(safe-area-inset-top)); left: calc(10px + env(safe-area-inset-left)); min-width: 0; padding: 6px 11px 7px; }
+  .route-name { font-size: 11px; }
+  .route-sub { font-size: 9px; margin-top: 2px; letter-spacing: 0.1em; }
+  .dots { margin-top: 6px; gap: 4px; }
+  .dot { width: 17px; height: 4px; }
+  .hud-tr { top: calc(8px + env(safe-area-inset-top)); right: calc(10px + env(safe-area-inset-right)); padding: 5px 12px 6px; }
+  .hud-tr .val { font-size: 19px; }
+  .hud-tr .sub { font-size: 8.5px; margin-top: 2px; }
+  .hud-pause {
+    top: calc(56px + env(safe-area-inset-top));
+    right: calc(10px + env(safe-area-inset-right));
+    width: 34px; height: 34px; border-radius: 11px;
+  }
+  .hud-pause svg { width: 12px; height: 12px; }
+  .hud-timer { top: calc(8px + env(safe-area-inset-top)); font-size: 18px; padding: 5px 16px; }
+  .hud-bl {
+    display: block;
+    left: 50%;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    width: 196px;
+    padding: 7px 12px 8px;
+  }
+  .gauge-val { font-size: 16px; }
+  .bar { height: 6px; margin-top: 4px; }
+  #toast { top: calc(56px + env(safe-area-inset-top)); font-size: 11.5px; padding: 7px 15px; }
+
+  /* touch controls */
+  #stickZone {
+    width: 132px; height: 132px;
+    left: calc(14px + env(safe-area-inset-left));
+    bottom: calc(12px + env(safe-area-inset-bottom));
+  }
+  #stickZone::after { inset: 24px; }
+  #stickKnob { width: 60px; height: 60px; margin: -30px 0 0 -30px; }
+  .stick-arrow { width: 20px; height: 20px; }
+  #boostBtn {
+    width: 86px; height: 86px;
+    right: calc(18px + env(safe-area-inset-right));
+    bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+
+  /* dialogs */
+  .dialog { width: min(460px, 78vw); padding: 16px 20px 14px; border-radius: 22px; }
+  .dialog .eyebrow { font-size: 9px; }
+  .dialog h2 { font-size: 21px; margin: 4px 0 2px; }
+  .dialog .lead { font-size: 11.5px; margin-bottom: 10px; }
+  .score-big { font-size: 42px; margin: 2px 0 0; }
+  .new-best { margin-top: 6px; font-size: 9.5px; padding: 3px 9px; }
+  .stat-grid { margin: 12px 0 12px; gap: 6px; }
+  .stat { padding: 7px 4px; border-radius: 11px; }
+  .stat .k { font-size: 8.5px; }
+  .stat .v { font-size: 15px; }
+  .btn-solid, .btn-ghost { height: 42px; font-size: 12.5px; }
+}
+
+/* short desktop windows: keep the panel scrollable but tidy */
+@media (orientation: landscape) and (min-width: 900px) and (max-height: 620px) {
+  .start-wrap { max-height: calc(100vh - 32px); }
+  h1.title { font-size: 42px; }
+  .tagline { margin-bottom: 12px; font-size: 12.5px; }
+  .modes { margin-bottom: 12px; }
+  .mode { padding: 8px 13px; }
+  .ctrls { margin-bottom: 12px; padding: 10px 13px; }
+}

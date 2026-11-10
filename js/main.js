@@ -56,6 +56,7 @@ const ui = {
   resultEyebrow: el('resultEyebrow'),
   newBest: el('newBest'),
   pauseBtn: el('pauseBtn'),
+  rotateGate: el('rotateGate'),
 };
 
 /* -------------------------------------------------------------------- save */
@@ -77,6 +78,35 @@ function persist() {
 }
 
 /* ------------------------------------------------------------------- state */
+let autoPausedForRotate = false;
+
+function isPortraitish() {
+  return window.innerHeight > window.innerWidth * 1.02;
+}
+
+function resizeViewport() {
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+}
+
+function syncOrientation() {
+  const need = isTouch && isPortraitish();
+  ui.rotateGate.classList.toggle('hidden', !need);
+  if (need) {
+    if (state.phase === 'playing') {
+      autoPausedForRotate = true;
+      pauseGame();
+    }
+  } else if (autoPausedForRotate) {
+    autoPausedForRotate = false;
+    if (state.phase === 'paused') resumeGame();
+  }
+}
+
 function portraitFactor() {
   const a = window.innerWidth / window.innerHeight;
   return a < 0.85 ? 1.5 : a < 1.2 ? 1.18 : 1;
@@ -141,6 +171,20 @@ function syncSoundIcon() {
   ui.soundOn.style.display = save.muted ? 'none' : 'block';
   ui.soundOff.style.display = save.muted ? 'block' : 'none';
   el('soundBtn').classList.toggle('off', save.muted);
+  const pill = el('pauseSound');
+  if (pill) {
+    pill.classList.toggle('off', save.muted);
+    el('pauseSoundLbl').textContent = save.muted ? t('soundOff') : t('soundOn');
+  }
+}
+
+function toggleSound() {
+  save.muted = !save.muted;
+  persist();
+  if (!audio.ctx) initAudio();
+  audio.setEnabled(!save.muted);
+  syncSoundIcon();
+  if (!save.muted) audio.ui();
 }
 
 /* --------------------------------------------------------------------- HUD */
@@ -388,15 +432,28 @@ const camTmp = new THREE.Vector3();
 const menuCenter = new THREE.Vector3();
 let menuAngle = 0;
 
+function menuFrame() {
+  const portrait = window.innerHeight > window.innerWidth;
+  const shortLand = !portrait && window.innerHeight <= 580;
+  return {
+    radius: portrait ? 62 : shortLand ? 50 : 66,
+    height: portrait ? 26 : shortLand ? 16 : 24,
+    shift: portrait ? -4 : shortLand ? -27 : -13,
+    drop: portrait ? 17 : 0,
+  };
+}
+
 function themeCameraSnap() {
   const post = world.post;
+  const f = menuFrame();
   menuCenter.copy(post.pos).add(new THREE.Vector3(0, 12, 0));
   menuAngle = 0.7;
-  camera.position.set(menuCenter.x + Math.cos(menuAngle) * 56, menuCenter.y + 20, menuCenter.z + Math.sin(menuAngle) * 56);
+  camera.position.set(menuCenter.x + Math.cos(menuAngle) * f.radius, menuCenter.y + f.height, menuCenter.z + Math.sin(menuAngle) * f.radius);
   camLook.copy(menuCenter);
   camera.lookAt(camLook);
   const right = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 0);
-  camLook.copy(menuCenter).addScaledVector(right, -13);
+  camLook.copy(menuCenter).addScaledVector(right, f.shift);
+  camLook.y -= f.drop;
   camera.lookAt(camLook);
   camera.fov = baseFov() - 6;
   camera.updateProjectionMatrix();
@@ -405,18 +462,18 @@ function themeCameraSnap() {
 function updateCamera(dt) {
   if (state.phase === 'menu' || state.phase === 'result') {
     menuAngle += dt * 0.075;
-    const narrow = window.innerWidth < 860;
-    const radius = narrow ? 56 : 56;
-    const y = menuCenter.y + (narrow ? 24 : 20) + Math.sin(menuAngle * 0.8) * 4;
+    const f = menuFrame();
+    const radius = f.radius;
+    const y = menuCenter.y + f.height + Math.sin(menuAngle * 0.8) * 4;
     camDesired.set(menuCenter.x + Math.cos(menuAngle) * radius, y, menuCenter.z + Math.sin(menuAngle) * radius);
     camera.position.lerp(camDesired, 1 - Math.exp(-1.6 * dt));
     const look = menuCenter.clone().add(new THREE.Vector3(0, Math.sin(menuAngle * 0.6) * 2, 0));
     camLook.lerp(look, 1 - Math.exp(-2 * dt));
     camera.lookAt(camLook);
-    // push the scene to the right so the start panel has room, and up on portrait
+    // push the scene aside so the start panel keeps the composition clean
     const right = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 0);
-    const lookPoint = camLook.clone().addScaledVector(right, narrow ? -4 : -13);
-    if (narrow) lookPoint.y -= 17;
+    const lookPoint = camLook.clone().addScaledVector(right, f.shift);
+    lookPoint.y -= f.drop;
     camera.lookAt(lookPoint);
     camera.fov += (baseFov() - 6 - camera.fov) * Math.min(1, dt * 2);
   } else if (state.phase === 'paused') {
@@ -559,6 +616,7 @@ const STICK_R = 52;
 ui.stickZone.addEventListener('pointerdown', (e) => {
   stickId = e.pointerId;
   ui.stickZone.setPointerCapture(e.pointerId);
+  ui.stickZone.classList.add('active');
   const r = ui.stickZone.getBoundingClientRect();
   stickX = r.left + r.width / 2;
   stickY = r.top + r.height / 2;
@@ -575,11 +633,29 @@ function endStick(e) {
   stickId = null;
   input.tClimb = 0;
   input.tTurn = 0;
+  ui.stickZone.classList.remove('active');
   ui.stickKnob.style.transform = 'translate(0px, 0px)';
+  setHotArrows(0, 0);
   syncInput();
 }
 ui.stickZone.addEventListener('pointerup', endStick);
 ui.stickZone.addEventListener('pointercancel', endStick);
+
+function deadZone(v, dz) {
+  if (Math.abs(v) <= dz) return 0;
+  return Math.sign(v) * ((Math.abs(v) - dz) / (1 - dz));
+}
+
+function setHotArrows(nx, ny) {
+  const up = ui.stickZone.querySelector('.stick-arrow.up');
+  const down = ui.stickZone.querySelector('.stick-arrow.down');
+  const left = ui.stickZone.querySelector('.stick-arrow.left');
+  const right = ui.stickZone.querySelector('.stick-arrow.right');
+  up.classList.toggle('hot', ny < -0.32);
+  down.classList.toggle('hot', ny > 0.32);
+  left.classList.toggle('hot', nx < -0.32);
+  right.classList.toggle('hot', nx > 0.32);
+}
 
 function onStick(e) {
   let dx = e.clientX - stickX;
@@ -590,8 +666,11 @@ function onStick(e) {
     dy = (dy / d) * STICK_R;
   }
   ui.stickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
-  input.tTurn = -(dx / STICK_R);
-  input.tClimb = -(dy / STICK_R);
+  const nx = dx / STICK_R;
+  const ny = dy / STICK_R;
+  input.tTurn = -deadZone(nx, 0.16);
+  input.tClimb = -deadZone(ny, 0.16);
+  setHotArrows(nx, ny);
   syncInput();
 }
 
@@ -732,18 +811,16 @@ el('startBtn').addEventListener('click', () => {
   startGame();
 });
 
-el('soundBtn').addEventListener('click', () => {
-  save.muted = !save.muted;
-  persist();
-  if (!audio.ctx) initAudio();
-  audio.setEnabled(!save.muted);
-  syncSoundIcon();
-  if (!save.muted) audio.ui();
-});
+el('soundBtn').addEventListener('click', toggleSound);
+el('pauseSound').addEventListener('click', toggleSound);
 
 el('langBtn').addEventListener('click', toggleLang);
 
 el('resumeBtn').addEventListener('click', resumeGame);
+el('pauseRestart').addEventListener('click', () => {
+  audio.ui();
+  startGame(state.mode);
+});
 el('pauseMenu').addEventListener('click', () => {
   showScreen('start');
   backToMenu();
@@ -753,23 +830,62 @@ el('resultMenu').addEventListener('click', backToMenu);
 el('pauseBtn').addEventListener('click', pauseGame);
 
 window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  resizeViewport();
+  syncOrientation();
 });
+
+window.addEventListener('orientationchange', () => {
+  setTimeout(() => {
+    resizeViewport();
+    syncOrientation();
+  }, 280);
+});
+
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', () => {
+    if (!isTouch) resizeViewport();
+  });
+}
+
+// iOS: block pinch-zoom / gesture zoom inside the game surface
+document.addEventListener('gesturestart', (e) => e.preventDefault());
+document.addEventListener('gesturechange', (e) => e.preventDefault());
+document.addEventListener('touchmove', (e) => {
+  if (e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+window.addEventListener('dblclick', (e) => e.preventDefault());
 
 document.addEventListener('visibilitychange', () => {
   if (document.hidden && state.phase === 'playing') pauseGame();
+  if (!document.hidden && audio.ctx && audio.ctx.state === 'suspended') audio.ctx.resume();
 });
 
 /* ------------------------------------------------------------------- boot */
+function isIosDevice() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
+function isStandalone() {
+  return window.navigator.standalone === true ||
+    window.matchMedia('(display-mode: standalone)').matches;
+}
+
 async function boot() {
   setLang(save.lang || 'zh');
   applyI18n();
   syncSoundIcon();
   buildDots();
   ui.bestStart.textContent = (save.best.orders || 0).toLocaleString();
+
+  // iOS Safari (not yet installed): nudge towards Add to Home Screen
+  if (isIosDevice() && !isStandalone()) {
+    const ih = document.getElementById('installHint');
+    const fh = document.getElementById('footHint');
+    if (ih) ih.style.display = 'inline-flex';
+    if (fh) fh.style.display = 'none';
+  }
+  document.body.classList.toggle('standalone', isStandalone());
 
   await plane.load('assets/models/plane.glb');
 
@@ -782,6 +898,8 @@ async function boot() {
 
   showScreen('start');
   window.__fie = { state, plane, world, camera, renderer, scene, startGame, finish };
+  resizeViewport();
+  syncOrientation();
   animate();
 
   setTimeout(() => {

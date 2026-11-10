@@ -1,0 +1,136 @@
+/* mobile controls */
+#touch { position: absolute; inset: 0; z-index: 22; pointer-events: none; display: none; }
+#touch.on { display: block; }
+
+#stickZone {
+  position: absolute;
+  left: calc(18px + env(safe-area-inset-left));
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  width: 146px;
+  height: 146px;
+  border-radius: 50%;
+  pointer-events: auto;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.10) 68%, rgba(255, 255, 255, 0.16));
+  border: 1.5px solid rgba(255, 255, 255, 0.62);
+  box-shadow: 0 14px 30px -18px rgba(10, 48, 80, 0.65), inset 0 0 24px rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px) saturate(1.1);
+  -webkit-backdrop-filter: blur(10px) saturate(1.1);
+  touch-action: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+#stickZone.active {
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 16px 34px -16px rgba(10, 48, 80, 0.7), inset 0 0 26px rgba(255, 255, 255, 0.35);
+}
+#stickZone::after {
+  content: "";
+  position: absolute;
+  inset: 26px;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 255, 255, 0.32);
+  pointer-events: none;
+}
+.stick-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+}
+.stick-arrow {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.72);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 1px 2px rgba(8, 44, 72, 0.45));
+  transition: stroke 0.12s ease, opacity 0.12s ease, transform 0.12s ease;
+  pointer-events: none;
+}
+.stick-arrow.up { top: 7px; left: 50%; margin-left: -11px; }
+.stick-arrow.down { bottom: 7px; left: 50%; margin-left: -11px; }
+.stick-arrow.left { left: 7px; top: 50%; margin-top: -11px; }
+.stick-arrow.right { right: 7px; top: 50%; margin-top: -11px; }
+.stick-arrow.hot { stroke: #ffd9a0; opacity: 1; }
+.stick-arrow.up.hot { transform: translateY(-2px); }
+.stick-arrow.down.hot { transform: translateY(2px); }
+.stick-arrow.left.hot { transform: translateX(-2px); }
+.stick-arrow.right.hot { transform: translateX(2px); }
+
+#stickKnob {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 66px;
+  height: 66px;
+  margin: -33px 0 0 -33px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, #ffffff, #fff1ea 68%, #ffe0d3);
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 10px 22px -8px rgba(10, 48, 80, 0.55), inset 0 -3px 8px rgba(255, 138, 100, 0.2);
+  display: grid;
+  place-items: center;
+  transition: transform 0.05s linear, box-shadow 0.15s ease;
+  will-change: transform;
+}
+#stickKnob svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: rgba(239, 79, 44, 0.5);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  opacity: 0.9;
+}
+#stickZone.active #stickKnob {
+  box-shadow: 0 14px 26px -10px rgba(239, 79, 44, 0.7), inset 0 -3px 8px rgba(255, 138, 100, 0.28);
+}
+
+#boostBtn {
+  position: absolute;
+  right: calc(20px + env(safe-area-inset-right));
+  bottom: calc(26px + env(safe-area-inset-bottom));
+  width: 94px;
+  height: 94px;
+  border-radius: 50%;
+  pointer-events: auto;
+  border: none;
+  background:
+    radial-gradient(closest-side, rgba(255, 255, 255, 0.97) 0 72%, rgba(255, 255, 255, 0) 73%),
+    conic-gradient(from -90deg, #ff6b4a calc(var(--e, 100) * 1%), rgba(255, 255, 255, 0.6) 0);
+  box-shadow: 0 14px 30px -14px rgba(239, 79, 44, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  font-family: inherit;
+  font-weight: 900;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--coral-deep);
+  touch-action: none;
+  transform: translateZ(0);
+  transition: transform 0.09s ease, opacity 0.2s ease, box-shadow 0.15s ease;
+}
+#boostBtn .boost-ico {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+  stroke: none;
+  margin-bottom: 1px;
+}
+#boostBtn.hit {
+  transform: scale(0.93);
+  box-shadow: 0 8px 18px -10px rgba(239, 79, 44, 0.9), inset 0 0 0 2px rgba(255, 255, 255, 0.9);
+}
+#boostBtn.empty { opacity: 0.58; }
+

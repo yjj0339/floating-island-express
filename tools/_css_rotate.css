@@ -1,0 +1,34 @@
+/* ------------------------------------------------------------ rotate gate */
+.rotate-gate {
+  position: absolute;
+  inset: 0;
+  z-index: 95;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: radial-gradient(circle at 50% 34%, #f2fbff 0%, #d6f0ff 55%, #bfe6ff 100%);
+  transition: opacity 0.32s ease, visibility 0.32s ease;
+}
+.rotate-gate.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.rotate-card { text-align: center; max-width: 320px; }
+.rotate-phone {
+  width: 86px;
+  height: 86px;
+  margin: 0 auto 20px;
+  border-radius: 26px;
+  display: grid;
+  place-items: center;
+  color: var(--coral);
+  background: #fff;
+  box-shadow: 0 20px 44px -20px rgba(14, 52, 84, 0.55), inset 0 -2px 0 rgba(255, 138, 100, 0.14);
+  animation: tiltHint 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.rotate-phone svg { width: 44px; height: 44px; }
+@keyframes tiltHint {
+  0%, 18% { transform: rotate(0deg); }
+  45%, 72% { transform: rotate(-90deg); }
+  100% { transform: rotate(0deg); }
+}
+.rotate-title { font-size: 19px; font-weight: 800; letter-spacing: -0.01em; }
+.rotate-sub { margin-top: 7px; font-size: 12.5px; line-height: 1.6; color: var(--ink-soft); }
+
