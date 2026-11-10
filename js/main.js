@@ -232,7 +232,7 @@ function startGame(modeOverride) {
   }
   // spawn just off the rim so the take-off never clips the island
   const fwd = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw));
-  const startPos = post.pos.clone().addScaledVector(fwd, post.radius * 1.12).add(new THREE.Vector3(0, 4.6, 0));
+  const startPos = post.pos.clone().addScaledVector(fwd, post.radius * 1.28).add(new THREE.Vector3(0, 9.5, 0));
   plane.reset(startPos, yaw);
   setScore(0);
   buildDots();
