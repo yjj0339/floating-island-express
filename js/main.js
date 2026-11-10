@@ -222,16 +222,18 @@ function startGame(modeOverride) {
   }
 
   const post = world.post;
-  const pad = post.pos.clone().add(new THREE.Vector3(0, 3.4, post.radius * 0.5));
 
   // face the first target (or forward for other modes)
   let yaw = Math.PI;
   const orderIslands = getOrderIslands();
   if (mode === 'orders' && orderIslands[0]) {
-    const d = new THREE.Vector3().subVectors(orderIslands[0].pos, pad);
+    const d = new THREE.Vector3().subVectors(orderIslands[0].pos, post.pos);
     yaw = angleToYaw(d.x, d.z);
   }
-  plane.reset(pad, yaw);
+  // spawn just off the rim so the take-off never clips the island
+  const fwd = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw));
+  const startPos = post.pos.clone().addScaledVector(fwd, post.radius * 1.12).add(new THREE.Vector3(0, 4.6, 0));
+  plane.reset(startPos, yaw);
   setScore(0);
   buildDots();
   ui.dots.style.display = mode === 'orders' ? 'flex' : 'none';
@@ -358,7 +360,7 @@ function backToMenu() {
   }
   world.resetRings();
   const post = world.post;
-  plane.reset(post.pos.clone().add(new THREE.Vector3(0, 3.4, 0)), 0.6);
+  plane.reset(post.pos.clone().add(new THREE.Vector3(0, 1.5, 0)), 0.6);
   audio.flight(0, 0, false);
   themeCameraSnap();
 }
@@ -772,7 +774,7 @@ async function boot() {
   await plane.load('assets/models/plane.glb');
 
   const post = world.post;
-  plane.reset(post.pos.clone().add(new THREE.Vector3(0, 3.4, 0)), 0.6);
+  plane.reset(post.pos.clone().add(new THREE.Vector3(0, 1.5, 0)), 0.6);
 
   themeCameraSnap();
   camera.position.set(menuCenter.x + Math.cos(menuAngle) * 86, menuCenter.y + 40, menuCenter.z + Math.sin(menuAngle) * 86);
