@@ -360,7 +360,7 @@ function backToMenu() {
   }
   world.resetRings();
   const post = world.post;
-  plane.reset(post.pos.clone().add(new THREE.Vector3(0, 1.5, 0)), 0.6);
+  plane.reset(post.pos.clone().add(new THREE.Vector3(0, 1.5, 4.5)), 0.9);
   audio.flight(0, 0, false);
   themeCameraSnap();
 }
@@ -774,7 +774,7 @@ async function boot() {
   await plane.load('assets/models/plane.glb');
 
   const post = world.post;
-  plane.reset(post.pos.clone().add(new THREE.Vector3(0, 1.5, 0)), 0.6);
+  plane.reset(post.pos.clone().add(new THREE.Vector3(0, 1.5, 4.5)), 0.9);
 
   themeCameraSnap();
   camera.position.set(menuCenter.x + Math.cos(menuAngle) * 86, menuCenter.y + 40, menuCenter.z + Math.sin(menuAngle) * 86);
