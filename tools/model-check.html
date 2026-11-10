@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>html,body{margin:0;height:100%;background:#cfeaff;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">{"imports":{"three":"../vendor/three.module.js","three/addons/":"../vendor/addons/"}}</script>
+</head><body>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+const r = new THREE.WebGLRenderer({antialias:true});
+r.setSize(innerWidth, innerHeight); r.outputColorSpace = THREE.SRGBColorSpace;
+document.body.appendChild(r.domElement);
+const s = new THREE.Scene(); s.background = new THREE.Color(0xbfe4ff);
+s.add(new THREE.HemisphereLight(0xffffff, 0xbfe4ff, 1.0));
+const d = new THREE.DirectionalLight(0xffffff, 1.6); d.position.set(4,8,6); s.add(d);
+const d2 = new THREE.DirectionalLight(0xffffff, 0.5); d2.position.set(-6,3,-4); s.add(d2);
+const cam = new THREE.PerspectiveCamera(38, innerWidth/innerHeight, 0.1, 100);
+const g = new THREE.Group(); s.add(g);
+new GLTFLoader().load('../assets/models/plane.glb', (gltf) => {
+  g.add(gltf.scene);
+  const box = new THREE.Box3().setFromObject(gltf.scene);
+  document.title = JSON.stringify({min:box.min.toArray(), max:box.max.toArray()});
+  window.__ready = true;
+});
+const angles = [[1.9,0.8,4.4],[4.6,0.7,0.2],[-3.6,1.1,-2.6],[0.6,2.9,4.2]];
+window.setView = (i) => {
+  const [x,y,z] = angles[i];
+  cam.position.set(x,y,z); cam.lookAt(0,0.1,0); r.render(s,cam);
+};
+window.setView(0);
+function loop(){ requestAnimationFrame(loop); r.render(s,cam); }
+loop();
+</script></body></html>
